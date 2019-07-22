@@ -1,7 +1,7 @@
 package mqtt
 
 import (
-	"fmt"
+  "fmt"
   "os"
   "encoding/json"
   MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -32,10 +32,13 @@ func discoverHandler(client MQTT.Client, msg MQTT.Message) {
         response = Req {
           ReqType: TYPE_DISCOVER_EXISTS,
           Host: req.Host,
-          Config: "yeet",
+          Config: *requested_config,
         }
       }
-      str, _ := json.Marshal(response)
+      str, err := json.Marshal(response)
+      if err != nil {
+        panic(err)
+      }
       client.Publish(msg.Topic(), 0, false, str)
     }
 }

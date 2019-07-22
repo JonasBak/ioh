@@ -21,7 +21,8 @@ func GetConfig() IOHConfig {
 }
 
 type PlantConfig struct {
-  Something int
+  Plant string
+  Water int
 }
 
 type IOHConfig struct {
@@ -29,24 +30,29 @@ type IOHConfig struct {
 }
 
 func (conf IOHConfig) GetConfig(p string) *PlantConfig {
-  val, err := conf.c.Get(fmt.Sprintf("%s%s", CONFIG_PREFIX, p)).Bytes()
+  val, err := conf.c.Get(fmt.Sprintf("%s%s", CONFIG_PREFIX, p)).Result()
   if err == redis.Nil {
     return nil
   } else if err != nil {
     panic(err)
   }
-  var config PlantConfig
-  json.Unmarshal(val, &config)
-  return &config
+  var c PlantConfig
+  json.Unmarshal([]byte(val), &c)
+  return &c
 }
 
 func (conf IOHConfig) SetConfig(p string, config PlantConfig) {
-  str, _ := json.Marshal(config)
-  conf.c.Set(UNCONFIGURED, str, 0)
+  str, err := json.Marshal(config)
+  if err != nil {
+    panic(err)
+  }
+  conf.c.Set(fmt.Sprintf("%s%s", CONFIG_PREFIX, p), str, 0)
+
+  conf.c.SRem(UNCONFIGURED, p)
 }
 
 func (conf IOHConfig) AddUnconfigured(p string) {
-  _, err := conf.c.SAdd(UNCONFIGURED, p).Result()
+  err := conf.c.SAdd(UNCONFIGURED, p).Err()
   if err != nil {
     panic(err)
   }
