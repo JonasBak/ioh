@@ -8,10 +8,6 @@ import (
   "github.com/JonasBak/ioh/hub/ioh_config"
 )
 
-func hubHandler(client MQTT.Client, msg MQTT.Message) {
-    fmt.Printf("recieved message: %s\n", msg.Payload())
-}
-
 func discoverHandler(client MQTT.Client, msg MQTT.Message) {
     fmt.Printf("recieved message: %s\n", msg.Payload())
 
@@ -32,7 +28,7 @@ func discoverHandler(client MQTT.Client, msg MQTT.Message) {
         response = Req {
           ReqType: TYPE_DISCOVER_EXISTS,
           Host: req.Host,
-          Config: *requested_config,
+          Config: requested_config,
         }
       }
       str, err := json.Marshal(response)
@@ -50,17 +46,11 @@ func defaultHandler(client MQTT.Client, msg MQTT.Message) {
 func ConnectAndListen() {
   opts := MQTT.NewClientOptions().AddBroker("tcp://mqtt_broker:1883")
 
-  opts.SetClientID(fmt.Sprintf("ioh-hub-%s", os.Getenv("HOSTNAME")))
+  opts.SetClientID(fmt.Sprintf("ioh-hub-sub-%s", os.Getenv("HOSTNAME")))
   opts.SetDefaultPublishHandler(defaultHandler)
 
-  topicHub := "ioh/hub"
-  topicDiscover := "ioh/discover"
-
   opts.OnConnect = func(c MQTT.Client) {
-    if token := c.Subscribe(topicHub, 0, hubHandler); token.Wait() && token.Error() != nil {
-      panic(token.Error())
-    }
-    if token := c.Subscribe(topicDiscover, 0, discoverHandler); token.Wait() && token.Error() != nil {
+    if token := c.Subscribe(get_topic_client_discover("+"), 0, discoverHandler); token.Wait() && token.Error() != nil {
       panic(token.Error())
     }
   }

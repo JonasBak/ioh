@@ -20,7 +20,7 @@ func GetConfig() IOHConfig {
   return IOHConfig {getClient()}
 }
 
-type PlantConfig struct {
+type ClientConfig struct {
   Plant string
   Water int
 }
@@ -29,19 +29,19 @@ type IOHConfig struct {
   c *redis.Client
 }
 
-func (conf IOHConfig) GetConfig(p string) *PlantConfig {
+func (conf IOHConfig) GetConfig(p string) *ClientConfig {
   val, err := conf.c.Get(fmt.Sprintf("%s%s", CONFIG_PREFIX, p)).Result()
   if err == redis.Nil {
     return nil
   } else if err != nil {
     panic(err)
   }
-  var c PlantConfig
+  var c ClientConfig
   json.Unmarshal([]byte(val), &c)
   return &c
 }
 
-func (conf IOHConfig) SetConfig(p string, config PlantConfig) {
+func (conf IOHConfig) SetConfig(p string, config ClientConfig) {
   str, err := json.Marshal(config)
   if err != nil {
     panic(err)

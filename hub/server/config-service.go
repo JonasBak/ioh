@@ -5,10 +5,12 @@ import (
   "net/http"
   "encoding/json"
   "github.com/JonasBak/ioh/hub/ioh_config"
+  "github.com/JonasBak/ioh/hub/mqtt"
 )
 
 func ConfigHandler() Handler {
   config := ioh_config.GetConfig()
+  publisher := mqtt.GetPublisher()
   return func(w http.ResponseWriter, r *http.Request) {
     fmt.Println(r.Method)
     if r.Method != http.MethodPost {
@@ -24,10 +26,12 @@ func ConfigHandler() Handler {
       return
     }
 
-    var c ioh_config.PlantConfig
+    var c ioh_config.ClientConfig
     defer r.Body.Close()
     json.NewDecoder(r.Body).Decode(&c)
 
     config.SetConfig(id[0], c)
+
+    publisher.UpdatedConfig(id[0], c)
   }
 }
