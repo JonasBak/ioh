@@ -1,11 +1,16 @@
+import fetch from "isomorphic-unfetch";
+import Container from "components/container";
+
 const Unconfigured = ({ unconfigured }) => {
   return (
-    <div>
+    <Container>
       <h2>Unconfigured</h2>
-      {unconfigured.map(id => (
-        <div key={id}>{id}</div>
-      ))}
-    </div>
+      <ul>
+        {unconfigured.map(id => (
+          <li key={id}>{id}</li>
+        ))}
+      </ul>
+    </Container>
   );
 };
 

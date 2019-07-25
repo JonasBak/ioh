@@ -1,18 +1,10 @@
-import Link from "next/link";
-import Head from "next/head";
 import fetch from "isomorphic-unfetch";
+import Container from "components/container";
+import Link from "next/link";
 
 const Index = ({ unconfigured, configured }) => {
   return (
-    <div>
-      <Head>
-        <title>IOH</title>
-        <link
-          rel="stylesheet"
-          href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+    <Container>
       <h2>IOH</h2>
       {unconfigured > 0 && (
         <div>
@@ -30,7 +22,7 @@ const Index = ({ unconfigured, configured }) => {
           to look at your configured plants
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 

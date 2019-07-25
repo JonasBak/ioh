@@ -2,13 +2,11 @@ version: "3.7"
 services:
   redis:
     image: redis:alpine
-    ports:
-      - "6379"
+  db:
+    build:
+      context: ./db
   mqtt_broker:
     image: eclipse-mosquitto
-    ports:
-      - "1883"
-      - "9001"
   hub:
     build:
       context: ./hub
@@ -16,4 +14,5 @@ services:
       - "5151:5151"
     depends_on:
       - redis
+      - db
       - mqtt_broker
