@@ -41,13 +41,32 @@ func (conf IOHConfig) GetConfig(p string) *ClientConfig {
   return &ClientConfig{plant, water}
 }
 
-func (conf IOHConfig) SetConfig(p string, config ClientConfig) {
+func (conf IOHConfig) updateConfig(p string, config ClientConfig) {
   // TODO handle both create and update
   // or have a function for each
 }
 
-func (conf IOHConfig) AddUnconfigured(p string) {
-  // TODO insert ino clients
+func (conf IOHConfig) createConfig(p string, config ClientConfig) {
+}
+
+
+func (conf IOHConfig) SetConfig(p string, config ClientConfig) {
+  existing := conf.GetConfig(p)
+  if existing == nil {
+    conf.createConfig(p, config)
+  } else {
+    conf.updateConfig(p, config)
+  }
+}
+
+func (conf IOHConfig) AddClient(p string) {
+  q := `INSERT INTO client (id)
+VALUES ($1)`
+
+  _, err := conf.db.Exec(q, p)
+  if err != nil {
+    panic(err)
+  }
 }
 
 func (conf IOHConfig) GetUnconfigured() []string {

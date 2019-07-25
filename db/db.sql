@@ -3,5 +3,13 @@ CREATE DATABASE ioh;
 GRANT ALL PRIVILEGES ON DATABASE ioh TO hub;
 
 CREATE TABLE clients (
-  id INT PRIMARY KEY
+  id VARCHAR(8) PRIMARY KEY,
+  config INT
 );
+CREATE TABLE configs (
+  pk INT NOT NULL PRIMARY KEY,
+  plant VARCHAR(24),
+  water INT
+);
+ALTER TABLE clients
+ADD FOREIGN KEY (config) REFERENCES configs(pk);

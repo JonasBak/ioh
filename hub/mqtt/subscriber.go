@@ -19,7 +19,7 @@ func discoverHandler(client MQTT.Client, msg MQTT.Message) {
       requested_config := config.GetConfig(req.Host)
       var response Req
       if requested_config == nil {
-        config.AddUnconfigured(req.Host)
+        config.AddClient(req.Host)
         response = Req {
           ReqType: TYPE_DISCOVER_ACK,
           Host: req.Host,

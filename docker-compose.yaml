@@ -1,7 +1,7 @@
 version: "3.7"
 services:
-  redis:
-    image: redis:alpine
+  # redis:
+  #   image: redis:alpine
   db:
     build:
       context: ./db
@@ -13,6 +13,5 @@ services:
     ports:
       - "5151:5151"
     depends_on:
-      - redis
       - db
       - mqtt_broker
