@@ -27,7 +27,7 @@ void connect_wifi() {
 
 void connect_mqtt() {
   Serial.println("Connecting to MQTT...");
-  
+
   client.setServer(MQTT_BROKER, MQTT_PORT);
   client.setCallback(callback);
 
@@ -43,7 +43,7 @@ void connect_mqtt() {
   sprintf(topic, "ioh/client/%s/discover", HOSTNAME);
   client.subscribe(topic);
   char msg[128];
-  sprintf(msg, "{\"ReqType\": \"discover_empty\", \"Host\": \"%s\"}", HOSTNAME);
+  sprintf(msg, "EMPTY", HOSTNAME);
   client.publish(topic, msg);
 }
 

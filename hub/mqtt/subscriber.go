@@ -2,6 +2,7 @@ package mqtt
 
 import (
   "fmt"
+  "strings"
   "os"
   "encoding/json"
   MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -11,32 +12,25 @@ import (
 func discoverHandler(client MQTT.Client, msg MQTT.Message) {
     fmt.Printf("recieved message: %s\n", msg.Payload())
 
-    var req Req
-    json.Unmarshal(msg.Payload(), &req)
-    config := ioh_config.GetConfig()
+    payload := string(msg.Payload())
 
-    if req.ReqType == TYPE_DISCOVER_EMPTY {
-      requested_config := config.GetConfig(req.Host)
-      var response Req
+    if payload == TYPE_DISCOVER_EMPTY {
+      config := ioh_config.GetConfig()
+      host := strings.Split(msg.Topic(), "/")[2]
+      requested_config := config.GetConfig(host)
+
       if requested_config == nil {
-        config.AddClient(req.Host)
-        response = Req {
-          ReqType: TYPE_DISCOVER_ACK,
-          Host: req.Host,
-        }
+        config.AddClient(host)
+        client.Publish(msg.Topic(), 0, false, TYPE_DISCOVER_ACK)
       } else {
-        response = Req {
-          ReqType: TYPE_DISCOVER_EXISTS,
-          Host: req.Host,
-          Config: requested_config,
+        // TODO use csv
+        str, err := json.Marshal(requested_config)
+        if err != nil {
+          panic(err)
         }
-      }
-      str, err := json.Marshal(response)
-      if err != nil {
-        panic(err)
-      }
-      client.Publish(msg.Topic(), 0, false, str)
+        client.Publish(get_topic_client_config(host), 0, false, str)
     }
+  }
 }
 
 func defaultHandler(client MQTT.Client, msg MQTT.Message) {

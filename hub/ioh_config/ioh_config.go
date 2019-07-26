@@ -6,12 +6,16 @@ import (
 )
 
 func GetConfig() IOHConfig {
-  connStr := "user=hub dbname=ioh sslmode=verify-full"
+  connStr := "user=hub dbname=ioh host=db sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}
   return IOHConfig {db}
+}
+
+type Client struct {
+  Id string
 }
 
 type ClientConfig struct {
@@ -23,6 +27,23 @@ type IOHConfig struct {
   db *sql.DB
 }
 
+func (conf IOHConfig) GetClient(p string) *Client {
+  q := "SELECT id FROM clients WHERE id = $1"
+
+  var (
+    id string
+  )
+
+  err := conf.db.QueryRow(q, p).Scan(&id)
+  if err == sql.ErrNoRows {
+    return nil
+  } else if err != nil {
+    panic(err)
+  }
+  return &Client{id}
+}
+
+
 func (conf IOHConfig) GetConfig(p string) *ClientConfig {
   q := "SELECT plant, water FROM configs WHERE clientid = $1"
 
@@ -31,7 +52,6 @@ func (conf IOHConfig) GetConfig(p string) *ClientConfig {
     water int
   )
 
-  // TODO p to int, or change id type in db.sql
   err := conf.db.QueryRow(q, p).Scan(&plant, &water)
   if err == sql.ErrNoRows {
     return nil
@@ -42,11 +62,21 @@ func (conf IOHConfig) GetConfig(p string) *ClientConfig {
 }
 
 func (conf IOHConfig) updateConfig(p string, config ClientConfig) {
-  // TODO handle both create and update
-  // or have a function for each
+  q := `UPDATE configs SET plant = $1, water = $2 WHERE clientid = $3`
+
+  _, err := conf.db.Exec(q, config.Plant, config.Water, p)
+  if err != nil {
+    panic(err)
+  }
 }
 
 func (conf IOHConfig) createConfig(p string, config ClientConfig) {
+  q := `INSERT INTO configs (plant, water, clientid) VALUES ($1, $2, $3)`
+
+  _, err := conf.db.Exec(q, config.Plant, config.Water, p)
+  if err != nil {
+    panic(err)
+  }
 }
 
 
@@ -60,8 +90,10 @@ func (conf IOHConfig) SetConfig(p string, config ClientConfig) {
 }
 
 func (conf IOHConfig) AddClient(p string) {
-  q := `INSERT INTO client (id)
-VALUES ($1)`
+  if conf.GetClient(p) != nil {
+    return
+  }
+  q := `INSERT INTO clients (id) VALUES ($1)`
 
   _, err := conf.db.Exec(q, p)
   if err != nil {
@@ -70,6 +102,22 @@ VALUES ($1)`
 }
 
 func (conf IOHConfig) GetUnconfigured() []string {
-  // TODO list all
-  return nil
+  q := "SELECT clients.id FROM clients LEFT JOIN configs ON clients.id = configs.clientid WHERE configs.id IS NULL"
+
+  rows, err := conf.db.Query(q)
+  if err != nil {
+    panic(err)
+  }
+  ids := []string{}
+  for rows.Next() {
+    var (
+      id string
+    )
+		if err := rows.Scan(&id); err != nil {
+			panic(err)
+		}
+    ids = append(ids, id)
+	}
+
+  return ids
 }

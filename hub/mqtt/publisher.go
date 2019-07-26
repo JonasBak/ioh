@@ -29,12 +29,8 @@ func GetPublisher() Publisher {
 }
 
 func (pub Publisher) UpdatedConfig(p string, c ioh_config.ClientConfig) {
-  response := Req {
-    ReqType: TYPE_CLIENT_UPDATED,
-    Host: p,
-    Config: &c,
-  }
-  str, err := json.Marshal(response)
+  // TODO use csv
+  str, err := json.Marshal(c)
   if err != nil {
     panic(err)
   }

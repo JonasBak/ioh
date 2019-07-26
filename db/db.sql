@@ -1,15 +1,25 @@
 CREATE USER hub;
 CREATE DATABASE ioh;
-GRANT ALL PRIVILEGES ON DATABASE ioh TO hub;
+
+\c ioh
 
 CREATE TABLE clients (
-  id VARCHAR(8) PRIMARY KEY,
-  config INT
+  id VARCHAR(8) PRIMARY KEY
 );
 CREATE TABLE configs (
-  pk INT NOT NULL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   plant VARCHAR(24),
-  water INT
+  water INT,
+  clientid VARCHAR(8) UNIQUE NOT NULL
 );
-ALTER TABLE clients
-ADD FOREIGN KEY (config) REFERENCES configs(pk);
+
+ALTER TABLE configs
+ADD FOREIGN KEY (clientid) REFERENCES clients(id);
+
+GRANT ALL PRIVILEGES ON TABLE clients TO hub;
+GRANT ALL PRIVILEGES ON TABLE configs TO hub;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO hub;
+
+\dt
+\d clients
+\d configs
