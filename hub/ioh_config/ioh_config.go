@@ -1,6 +1,7 @@
 package ioh_config
 
 import (
+  "fmt"
   "database/sql"
   _ "github.com/lib/pq"
 )
@@ -21,6 +22,10 @@ type Client struct {
 type ClientConfig struct {
   Plant string
   Water int
+}
+
+func (conf ClientConfig) ToString() string {
+  return fmt.Sprintf("%d", conf.Water)
 }
 
 type IOHConfig struct {
@@ -63,22 +68,13 @@ func (conf IOHConfig) GetConfig(p string) *ClientConfig {
 
 func (conf IOHConfig) updateConfig(p string, config ClientConfig) {
   q := `UPDATE configs SET plant = $1, water = $2 WHERE clientid = $3`
-
-  _, err := conf.db.Exec(q, config.Plant, config.Water, p)
-  if err != nil {
-    panic(err)
-  }
+  exec(conf.db, q, config.Plant, config.Water, p)
 }
 
 func (conf IOHConfig) createConfig(p string, config ClientConfig) {
   q := `INSERT INTO configs (plant, water, clientid) VALUES ($1, $2, $3)`
-
-  _, err := conf.db.Exec(q, config.Plant, config.Water, p)
-  if err != nil {
-    panic(err)
-  }
+  exec(conf.db, q, config.Plant, config.Water, p)
 }
-
 
 func (conf IOHConfig) SetConfig(p string, config ClientConfig) {
   existing := conf.GetConfig(p)
@@ -94,30 +90,15 @@ func (conf IOHConfig) AddClient(p string) {
     return
   }
   q := `INSERT INTO clients (id) VALUES ($1)`
-
-  _, err := conf.db.Exec(q, p)
-  if err != nil {
-    panic(err)
-  }
+  exec(conf.db, q, p)
 }
 
 func (conf IOHConfig) GetUnconfigured() []string {
   q := "SELECT clients.id FROM clients LEFT JOIN configs ON clients.id = configs.clientid WHERE configs.id IS NULL"
+  return listClients(conf.db, q)
+}
 
-  rows, err := conf.db.Query(q)
-  if err != nil {
-    panic(err)
-  }
-  ids := []string{}
-  for rows.Next() {
-    var (
-      id string
-    )
-		if err := rows.Scan(&id); err != nil {
-			panic(err)
-		}
-    ids = append(ids, id)
-	}
-
-  return ids
+func (conf IOHConfig) GetConfigured() []string {
+  q := "SELECT clients.id FROM clients LEFT JOIN configs ON clients.id = configs.clientid WHERE NOT configs.id IS NULL"
+  return listClients(conf.db, q)
 }

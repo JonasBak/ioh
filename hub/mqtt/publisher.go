@@ -3,7 +3,6 @@ package mqtt
 import (
   "fmt"
   "os"
-  "encoding/json"
   MQTT "github.com/eclipse/paho.mqtt.golang"
   "github.com/JonasBak/ioh/hub/ioh_config"
 )
@@ -29,10 +28,6 @@ func GetPublisher() Publisher {
 }
 
 func (pub Publisher) UpdatedConfig(p string, c ioh_config.ClientConfig) {
-  // TODO use csv
-  str, err := json.Marshal(c)
-  if err != nil {
-    panic(err)
-  }
+  str := c.ToString()
   pub.c.Publish(get_topic_client_config(p), 0, false, str)
 }

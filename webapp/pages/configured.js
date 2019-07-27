@@ -6,8 +6,8 @@ const Configured = ({ configured }) => {
     <Container>
       <h2>Configured</h2>
       <ul>
-        {configured.map(({ Host, Name, Water }) => (
-          <li key={Host}>{Name}</li>
+        {configured.map(id => (
+          <li key={id}>{id}</li>
         ))}
       </ul>
     </Container>

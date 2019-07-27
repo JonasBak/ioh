@@ -5,6 +5,8 @@ services:
       context: ./db
   mqtt_broker:
     image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
   hub:
     build:
       context: ./hub
@@ -13,3 +15,10 @@ services:
     depends_on:
       - db
       - mqtt_broker
+  webapp:
+    build:
+      context: ./webapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - hub
