@@ -1,3 +1,4 @@
+import { BASE_URL } from "utils/config";
 import fetch from "isomorphic-unfetch";
 import Container from "components/container";
 import Link from "next/link";
@@ -28,8 +29,8 @@ const Index = ({ unconfigured, configured }) => {
 
 Index.getInitialProps = async ({ req }) => {
   const res = await Promise.all([
-    fetch("http://localhost:3000/api/unconfigured"),
-    fetch("http://localhost:3000/api/configured")
+    fetch(`${BASE_URL}/api/unconfigured`),
+    fetch(`${BASE_URL}/api/configured`)
   ]);
   const list = await Promise.all(res.map(r => r.json()));
   return { unconfigured: list[0].length, configured: list[1].length };

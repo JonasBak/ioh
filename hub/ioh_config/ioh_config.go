@@ -7,7 +7,7 @@ import (
 )
 
 func GetConfig() IOHConfig {
-  connStr := "user=hub dbname=ioh host=db sslmode=disable"
+  connStr := "user=postgres password=TODO dbname=ioh host=db sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
@@ -20,8 +20,9 @@ type Client struct {
 }
 
 type ClientConfig struct {
-  Plant string
-  Water int
+  Plant string `json:"plant"`
+  Water int `json:"water"`
+  Timestamp string `json:"timestamp"`
 }
 
 func (conf ClientConfig) ToString() string {
@@ -50,20 +51,21 @@ func (conf IOHConfig) GetClient(p string) *Client {
 
 
 func (conf IOHConfig) GetConfig(p string) *ClientConfig {
-  q := "SELECT plant, water FROM configs WHERE clientid = $1"
+  q := "SELECT plant, water, timestamp FROM configs WHERE clientid = $1"
 
   var (
     plant string
     water int
+    timestamp string
   )
 
-  err := conf.db.QueryRow(q, p).Scan(&plant, &water)
+  err := conf.db.QueryRow(q, p).Scan(&plant, &water, &timestamp)
   if err == sql.ErrNoRows {
     return nil
   } else if err != nil {
     panic(err)
   }
-  return &ClientConfig{plant, water}
+  return &ClientConfig{plant, water, timestamp}
 }
 
 func (conf IOHConfig) updateConfig(p string, config ClientConfig) {

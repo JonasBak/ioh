@@ -3,8 +3,11 @@ services:
   db:
     build:
       context: ./db
+    environment:
+      - POSTGRES_PASSWORD=TODO
   mqtt_broker:
-    image: eclipse-mosquitto
+    build:
+      context: ./mqtt-broker
     ports:
       - "1883:1883"
   hub:

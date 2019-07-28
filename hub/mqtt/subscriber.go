@@ -35,6 +35,8 @@ func defaultHandler(client MQTT.Client, msg MQTT.Message) {
 func ConnectAndListen() {
   opts := MQTT.NewClientOptions().AddBroker("tcp://mqtt_broker:1883")
 
+  opts.SetUsername("client")
+  opts.SetPassword("TODO")
   opts.SetClientID(fmt.Sprintf("ioh-hub-sub-%s", os.Getenv("HOSTNAME")))
   opts.SetDefaultPublishHandler(defaultHandler)
 

@@ -8,6 +8,8 @@ const char* WIFI_SSID = "NextGenTel_E13E";
 const char* WIFI_PASSWORD = "1C8CCDB197";
 const char* MQTT_BROKER = "10.0.0.138";
 const int   MQTT_PORT = 1883;
+const char* MQTT_USER = "client";
+const char* MQTT_PASSWORD = "TODO";
 
 char HOSTNAME[8];
 
@@ -42,7 +44,7 @@ void connect_mqtt() {
   client.setServer(MQTT_BROKER, MQTT_PORT);
   client.setCallback(callback);
   while (!client.connected()) {
-    if (!client.connect(HOSTNAME, NULL, NULL)) {
+    if (!client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD)) {
       Serial.print(".");
       delay(500);
     }
@@ -62,13 +64,13 @@ void setup() {
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
-  
+
   String(ESP.getChipId(), HEX).toCharArray(HOSTNAME, 8);
-  
+
   connect_wifi();
   connect_mqtt();
   subscribe_mqtt();
-  
+
   current_state = EMPTY;
 }
 
@@ -110,11 +112,12 @@ void do_running() {
 void loop() {
   STATE prev = current_state;
   if (!client.connected()) {
-    if (millis() - LAST_CONNECT > 1000) {
+    if (millis() - LAST_CONNECT > 5000) {
       digitalWrite(LED_PIN, LOW);
-      if (client.connect(HOSTNAME, NULL, NULL)) {
+      if (client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD)) {
         subscribe_mqtt();
       }
+      LAST_CONNECT = millis();
     }
   }
   else {

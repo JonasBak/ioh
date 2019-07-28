@@ -21,10 +21,10 @@ func listClients(db *sql.DB, q string) []string {
     var (
       id string
     )
-		if err := rows.Scan(&id); err != nil {
-			panic(err)
-		}
+    if err := rows.Scan(&id); err != nil {
+      panic(err)
+    }
     ids = append(ids, id)
-	}
+  }
   return ids
 }
