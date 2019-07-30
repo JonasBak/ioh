@@ -95,6 +95,11 @@ func (conf IOHConfig) AddClient(p string) {
   exec(conf.db, q, p)
 }
 
+func (conf IOHConfig) SetActive(p string, value bool) {
+  q := `UPDATE clients SET active = $1 WHERE id = $2`
+  exec(conf.db, q, p, value)
+}
+
 func (conf IOHConfig) GetUnconfigured() []string {
   q := "SELECT clients.id FROM clients LEFT JOIN configs ON clients.id = configs.clientid WHERE configs.id IS NULL"
   return listClients(conf.db, q)

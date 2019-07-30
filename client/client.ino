@@ -26,7 +26,7 @@ struct CONFIG {
 const int LED_PIN = 2;
 unsigned long LAST_CONNECT;
 
-void connect_wifi() {
+void connect_wifi_initial() {
   Serial.print("Connecting to WIFI...");
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -39,12 +39,12 @@ void connect_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void connect_mqtt() {
+void connect_mqtt_initial() {
   Serial.print("Connecting to MQTT...");
   client.setServer(MQTT_BROKER, MQTT_PORT);
   client.setCallback(callback);
   while (!client.connected()) {
-    if (!client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD)) {
+    if (!connect_mqtt()) {
       Serial.print(".");
       delay(500);
     }
@@ -52,12 +52,21 @@ void connect_mqtt() {
   Serial.println("\nConnected!");
 }
 
-void subscribe_mqtt() {
+bool connect_mqtt() {
+  // TODO set all topics in setup
+  char status_topic[32];
+  sprintf(topic, "ioh/client/%s/status", HOSTNAME);
+  if (!client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD, topic, 0, 1, "OFF")) {
+    return false;
+  }
   char topic[32];
   sprintf(topic, "ioh/client/%s/hub", HOSTNAME);
   client.subscribe(topic);
   sprintf(topic, "ioh/client/%s/config", HOSTNAME);
   client.subscribe(topic);
+
+  client.publish(status_topic, "ON");
+  return true;
 }
 
 void setup() {
@@ -67,9 +76,8 @@ void setup() {
 
   String(ESP.getChipId(), HEX).toCharArray(HOSTNAME, 8);
 
-  connect_wifi();
-  connect_mqtt();
-  subscribe_mqtt();
+  connect_wifi_initial();
+  connect_mqtt_initial();
 
   current_state = EMPTY;
 }
@@ -114,9 +122,7 @@ void loop() {
   if (!client.connected()) {
     if (millis() - LAST_CONNECT > 5000) {
       digitalWrite(LED_PIN, LOW);
-      if (client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD)) {
-        subscribe_mqtt();
-      }
+      connect_mqtt();
       LAST_CONNECT = millis();
     }
   }

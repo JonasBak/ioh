@@ -28,6 +28,16 @@ func discoverHandler(client MQTT.Client, msg MQTT.Message) {
   }
 }
 
+func statusHandler(client MQTT.Client, msg MQTT.Message) {
+  host := strings.Split(msg.Topic(), "/")[2]
+  fmt.Printf("recieved message: %s, from client %s\n", msg.Payload(), host)
+
+  payload := string(msg.Payload())
+  // Should maybe share instance?
+  config := ioh_config.GetConfig()
+  config.SetActive(host, payload == TYPE_STATUS_ON)
+}
+
 func defaultHandler(client MQTT.Client, msg MQTT.Message) {
   fmt.Printf("recieved message: %s\n", msg.Payload())
 }
@@ -42,6 +52,9 @@ func ConnectAndListen() {
 
   opts.OnConnect = func(c MQTT.Client) {
     if token := c.Subscribe(get_topic_client_discover("+"), 0, discoverHandler); token.Wait() && token.Error() != nil {
+      panic(token.Error())
+    }
+    if token := c.Subscribe(get_topic_client_status("+"), 0, statusHandler); token.Wait() && token.Error() != nil {
       panic(token.Error())
     }
   }
