@@ -16,7 +16,8 @@ func GetConfig() IOHConfig {
 }
 
 type Client struct {
-  Id string
+  Id string `json:"id"`
+  Active bool `json:"active"`
 }
 
 type ClientConfig struct {
@@ -36,17 +37,15 @@ type IOHConfig struct {
 func (conf IOHConfig) GetClient(p string) *Client {
   q := "SELECT id FROM clients WHERE id = $1"
 
-  var (
-    id string
-  )
+  var client Client
 
-  err := conf.db.QueryRow(q, p).Scan(&id)
+  err := conf.db.QueryRow(q, p).Scan(&client.Id, &client.Active)
   if err == sql.ErrNoRows {
     return nil
   } else if err != nil {
     panic(err)
   }
-  return &Client{id}
+  return &client
 }
 
 
@@ -100,12 +99,12 @@ func (conf IOHConfig) SetActive(p string, value bool) {
   exec(conf.db, q, p, value)
 }
 
-func (conf IOHConfig) GetUnconfigured() []string {
+func (conf IOHConfig) GetUnconfigured() []Client {
   q := "SELECT clients.id FROM clients LEFT JOIN configs ON clients.id = configs.clientid WHERE configs.id IS NULL"
   return listClients(conf.db, q)
 }
 
-func (conf IOHConfig) GetConfigured() []string {
+func (conf IOHConfig) GetConfigured() []Client {
   q := "SELECT clients.id FROM clients LEFT JOIN configs ON clients.id = configs.clientid WHERE NOT configs.id IS NULL"
   return listClients(conf.db, q)
 }

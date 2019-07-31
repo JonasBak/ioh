@@ -11,20 +11,18 @@ func exec(db *sql.DB, q string, args ...interface{}) {
   }
 }
 
-func listClients(db *sql.DB, q string) []string {
+func listClients(db *sql.DB, q string) []Client {
   rows, err := db.Query(q)
   if err != nil {
     panic(err)
   }
-  ids := []string{}
+  clients := []Client{}
   for rows.Next() {
-    var (
-      id string
-    )
-    if err := rows.Scan(&id); err != nil {
+    var client Client
+    if err := rows.Scan(&client.Id, &client.Active); err != nil {
       panic(err)
     }
-    ids = append(ids, id)
+    clients = append(clients, client)
   }
-  return ids
+  return clients
 }

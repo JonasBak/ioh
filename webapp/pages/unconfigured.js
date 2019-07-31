@@ -6,7 +6,7 @@ import PlantConfigForm from "components/plantConfigForm";
 const Unconfigured = ({ unconfigured }) => (
   <Container>
     <h2>Unconfigured</h2>
-    {unconfigured.map(id => (
+    {unconfigured.map(({ id }) => (
       <PlantConfigForm key={id} id={id} />
     ))}
   </Container>

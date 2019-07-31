@@ -23,5 +23,7 @@ services:
       context: ./webapp
     ports:
       - "3000:3000"
+    environment:
+      - URL_ENV=dev_compose
     depends_on:
       - hub

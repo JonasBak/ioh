@@ -2,8 +2,7 @@ FROM mhart/alpine-node
 
 WORKDIR /app
 
-COPY package.json .
-COPY yarn.lock .
+COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY . .
