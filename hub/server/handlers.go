@@ -10,7 +10,9 @@ import (
 
 func QueryHandler(config ioh_config.IOHConfig, publisher mqtt.Publisher) Handler {
 	opts := []graphql.SchemaOpt{graphql.UseFieldResolvers(), graphql.MaxParallelism(20)}
-	resolver := ioh_config.NewResolver(config)
+	resolver := ioh_config.NewResolver(config, func(id string, c ioh_config.ClientConfig) {
+		publisher.UpdatedConfig(id, c)
+	})
 	schema := graphql.MustParseSchema(ioh_config.Schema, &resolver, opts...)
 	handler := relay.Handler{Schema: schema}
 	return func(w http.ResponseWriter, r *http.Request) {

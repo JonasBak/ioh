@@ -51,11 +51,12 @@ type ClientConfigInput struct {
 }
 
 type Resolver struct {
-	config IOHConfig
+	config         IOHConfig
+	onConfigChange func(string, ClientConfig)
 }
 
-func NewResolver(config IOHConfig) Resolver {
-	return Resolver{config}
+func NewResolver(config IOHConfig, onConfigChange func(string, ClientConfig)) Resolver {
+	return Resolver{config, onConfigChange}
 }
 
 func (r *Resolver) Clients() []Client {
@@ -71,5 +72,6 @@ func (r *Resolver) SetConfig(args struct {
 }) (*ClientConfig, error) {
 	clientConfig := ClientConfig{Plant: args.Config.Plant, Water: int(args.Config.Water)}
 	r.config.SetConfig(string(args.Config.ClientId), clientConfig)
+	r.onConfigChange(string(args.Config.ClientId), clientConfig)
 	return r.config.GetConfig(string(args.Config.ClientId)), nil
 }

@@ -14,9 +14,6 @@ func main() {
 
 	config := ioh_config.GetConfig()
 	publisher := mqtt.GetPublisher()
-	http.HandleFunc("/config", server.ConfigHandler(config, publisher))
-	http.HandleFunc("/unconfigured", server.UnconfiguredHandler(config, publisher))
-	http.HandleFunc("/configured", server.ConfiguredHandler(config, publisher))
 	http.HandleFunc("/", server.GQLHandler(config, publisher))
 	http.HandleFunc("/query", server.QueryHandler(config, publisher))
 	http.ListenAndServe(":5151", nil)
