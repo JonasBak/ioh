@@ -1,26 +1,29 @@
 import { BASE_URL } from "utils/config";
-import fetch from "isomorphic-unfetch";
 import Container from "components/container";
+import { getClients } from "utils/req";
 import Link from "next/link";
+import PlantConfigForm from "components/plantConfigForm";
 
-const Index = ({ unconfigured, configured }) => {
+const Index = ({ clients }) => {
+  const configured = clients.filter(c => !!c.config);
+  const unconfigured = clients.filter(c => !c.config);
   return (
     <Container>
       <h2>IOH</h2>
-      {unconfigured > 0 && (
+      {unconfigured.length > 0 && (
         <div>
-          <Link href="/unconfigured">
-            <a>Click here</a>
-          </Link>{" "}
-          to configure your {unconfigured} unconfigured plants!
+          <h2>Unconfigured</h2>
+          {unconfigured.map(client => (
+            <PlantConfigForm key={client.id} {...client} />
+          ))}
         </div>
       )}
-      {configured > 0 && (
+      {configured.length > 0 && (
         <div>
-          <Link href="/configured">
-            <a>Click here</a>
-          </Link>{" "}
-          to look at your configured plants
+          <h2>Configured</h2>
+          {configured.map(client => (
+            <PlantConfigForm key={client.id} {...client} />
+          ))}
         </div>
       )}
     </Container>
@@ -28,12 +31,8 @@ const Index = ({ unconfigured, configured }) => {
 };
 
 Index.getInitialProps = async ({ req }) => {
-  const res = await Promise.all([
-    fetch(`${BASE_URL}/api/unconfigured`),
-    fetch(`${BASE_URL}/api/configured`)
-  ]);
-  const list = await Promise.all(res.map(r => r.json()));
-  return { unconfigured: list[0].length, configured: list[1].length };
+  const queryResult = await getClients();
+  return queryResult.data;
 };
 
 export default Index;

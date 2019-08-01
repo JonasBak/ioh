@@ -1,15 +1,13 @@
 import { Component } from "react";
+import { setConfig } from "utils/req";
 import { BASE_URL } from "utils/config";
 
-const postConfig = (id, config) => {
-  fetch(`${BASE_URL}/api/config`, {
-    method: "POST",
-    body: JSON.stringify({ ...config, id })
-  });
-};
-
 class PlantConfigForm extends Component {
-  state = {};
+  constructor(props) {
+    super(props);
+    const { plant, water } = props.config || {};
+    this.state = { plant, water };
+  }
   render() {
     const { id } = this.props;
     return (
@@ -33,7 +31,13 @@ class PlantConfigForm extends Component {
             });
           }}
         />
-        <button onClick={() => postConfig(id, this.state)}>Configure</button>
+        <button
+          onClick={() =>
+            setConfig(id, this.state["plant"], this.state["water"])
+          }
+        >
+          Configure
+        </button>
       </div>
     );
   }
