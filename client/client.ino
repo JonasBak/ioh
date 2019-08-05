@@ -1,13 +1,28 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <WiFiClientSecure.h>
 
-WiFiClient espClient;
+// generated with 'openssl x509 -pubkey -noout -in cert.pem'
+static const char pubkey[] PROGMEM = R"KEY(
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArmB24OFMGjGhYiR+goMf
+tymcL+n+GNZiSKGmjJHoEOgTMrth3ZaGPSLR7a5u1Lu1qZ2aoM04Oqb+56OpPByw
+7ZoJ+/p4/4iliGyPaO8JKfVICievtAA6EwNVjbnfH9LbZBRqzbeaZ70dFrjvFt6/
+bQds3XK71jVS27Mqo8d1d5NmoDw6BkabOpgnc/eBPEKsM2YfBv7Ah1oCaBYp8g2i
+XMAQgKS1wc4ojOjxnl8bGAgGhmbysJvcjSo+TyaHGcUVONWxzTWu/Qkuay/yo6yf
+NpYaTgUjqvxJ1UlwfiLob3n5qd5ox9GdVXTD7MLNRwahjEc/wDPgmpGjzcXm5roo
+OwIDAQAB
+-----END PUBLIC KEY-----
+)KEY";
+
+BearSSL::WiFiClientSecure espClient;
+BearSSL::PublicKey key(pubkey);
 PubSubClient client(espClient);
 
 const char* WIFI_SSID = "Bakkens nett";
 const char* WIFI_PASSWORD = "";
-const char* MQTT_BROKER = "192.168.86.35";
-const int   MQTT_PORT = 1883;
+const char* MQTT_BROKER = "mqtt.jbakken.com";
+const int   MQTT_PORT = 6543;
 const char* MQTT_USER = "";
 const char* MQTT_PASSWORD = "";
 
@@ -52,6 +67,10 @@ void connect_mqtt_initial() {
   Serial.println("\nConnected!");
 }
 
+void set_cert_initial() {
+  espClient.setKnownKey(&key);
+}
+
 bool connect_mqtt() {
   // TODO set all topics in setup
   char status_topic[32];
@@ -77,6 +96,7 @@ void setup() {
   String(ESP.getChipId(), HEX).toCharArray(HOSTNAME, 8);
 
   connect_wifi_initial();
+  set_cert_initial();
   connect_mqtt_initial();
 
   current_state = EMPTY;
