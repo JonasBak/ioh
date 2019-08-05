@@ -1,4 +1,3 @@
-import { BASE_URL } from "utils/config";
 import Container from "components/container";
 import { getClients } from "utils/req";
 import Link from "next/link";

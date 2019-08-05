@@ -15,15 +15,22 @@ services:
       context: ./hub
     ports:
       - "5151:5151"
+    environment:
+      - MQTT_BROKER=tcp://mqtt_broker:1883
+      - MQTT_USER=client
+      - MQTT_PASSWORD=TODO
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=TODO
     depends_on:
       - db
       - mqtt_broker
-  webapp:
-    build:
-      context: ./webapp
-    ports:
-      - "3000:3000"
-    environment:
-      - URL_ENV=dev_compose
-    depends_on:
-      - hub
+  # webapp:
+  #   build:
+  #     context: ./webapp
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - URL_ENV=dev_compose
+  #   depends_on:
+  #     - hub

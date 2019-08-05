@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"os"
 )
 
 func GetConfig() IOHConfig {
-	connStr := "user=postgres password=TODO dbname=ioh host=db sslmode=disable"
+	connStr := fmt.Sprintf("user=%s password=%s dbname=ioh host=%s sslmode=disable", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"))
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
@@ -95,8 +96,9 @@ func (conf IOHConfig) AddClient(p string) {
 }
 
 func (conf IOHConfig) SetActive(p string, value bool) {
+	conf.AddClient(p)
 	q := `UPDATE clients SET active = $1 WHERE id = $2`
-	exec(conf.db, q, p, value)
+	exec(conf.db, q, value, p)
 }
 
 func (conf IOHConfig) GetClients() []Client {

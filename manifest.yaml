@@ -1,0 +1,97 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ioh-db
+  labels:
+    app: ioh-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ioh-db
+  template:
+    metadata:
+      labels:
+        app: ioh-db
+    spec:
+      containers:
+      - name: ioh-db
+        image: jonasbak/ioh-db
+        ports:
+        - containerPort: 5432
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ioh-hub
+  labels:
+    app: ioh-hub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ioh-hub
+  template:
+    metadata:
+      labels:
+        app: ioh-hub
+    spec:
+      containers:
+      - name: ioh-hub
+        image: jonasbak/ioh-hub
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5151
+        env:
+        - name: MQTT_BROKER
+          value: "tcp://mqtt-broker:1883"
+        - name: MQTT_USER
+          value: ""
+        - name: MQTT_PASSWORD
+          value: ""
+        - name: POSTGRES_HOST
+          value: "ioh-db"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "TODO"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ioh-db
+  labels:
+    app: ioh-db
+spec:
+  selector:
+    app: ioh-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ioh-hub
+  labels:
+    app: ioh-hub
+spec:
+  selector:
+    app: ioh-hub
+  ports:
+    - port: 5151
+      targetPort: 5151
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ioh-hub-api
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`ioh-api.jbakken.com`)
+    kind: Rule
+    services:
+    - name: ioh-hub
+      port: 5151

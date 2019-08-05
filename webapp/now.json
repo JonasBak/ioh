@@ -1,4 +1,9 @@
 {
   "name": "ioh-webapp",
-  "version": 2
+  "version": 2,
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
 }

@@ -4,12 +4,12 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-const char* WIFI_SSID = "NextGenTel_E13E";
-const char* WIFI_PASSWORD = "1C8CCDB197";
-const char* MQTT_BROKER = "10.0.0.138";
+const char* WIFI_SSID = "Bakkens nett";
+const char* WIFI_PASSWORD = "";
+const char* MQTT_BROKER = "192.168.86.35";
 const int   MQTT_PORT = 1883;
-const char* MQTT_USER = "client";
-const char* MQTT_PASSWORD = "TODO";
+const char* MQTT_USER = "";
+const char* MQTT_PASSWORD = "";
 
 char HOSTNAME[8];
 
@@ -55,8 +55,8 @@ void connect_mqtt_initial() {
 bool connect_mqtt() {
   // TODO set all topics in setup
   char status_topic[32];
-  sprintf(topic, "ioh/client/%s/status", HOSTNAME);
-  if (!client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD, topic, 0, 1, "OFF")) {
+  sprintf(status_topic, "ioh/client/%s/status", HOSTNAME);
+  if (!client.connect(HOSTNAME, MQTT_USER, MQTT_PASSWORD, status_topic, 0, 1, "OFF")) {
     return false;
   }
   char topic[32];

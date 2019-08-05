@@ -12,10 +12,10 @@ type Publisher struct {
 }
 
 func GetPublisher() Publisher {
-	opts := MQTT.NewClientOptions().AddBroker("tcp://mqtt_broker:1883")
+	opts := MQTT.NewClientOptions().AddBroker(os.Getenv("MQTT_BROKER"))
 
-	opts.SetUsername("client")
-	opts.SetPassword("TODO")
+	opts.SetUsername(os.Getenv("MQTT_USER"))
+	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
 	opts.SetClientID(fmt.Sprintf("ioh-hub-pub-%s", os.Getenv("HOSTNAME")))
 	opts.SetDefaultPublishHandler(defaultHandler)
 

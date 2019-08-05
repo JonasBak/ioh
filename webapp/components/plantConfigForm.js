@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { setConfig } from "utils/req";
-import { BASE_URL } from "utils/config";
 
 class PlantConfigForm extends Component {
   constructor(props) {
