@@ -3,7 +3,9 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "export": "next export"
+    "export": "next export",
+    "deploy:staging": "now",
+    "deploy:production": "now --target production"
   },
   "dependencies": {
     "isomorphic-unfetch": "^3.0.0",
