@@ -1,28 +1,6 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: ioh-db
-  labels:
-    app: ioh-db
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ioh-db
-  template:
-    metadata:
-      labels:
-        app: ioh-db
-    spec:
-      containers:
-      - name: ioh-db
-        image: jonasbak/ioh-db
-        ports:
-        - containerPort: 5432
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
   name: ioh-hub
   labels:
     app: ioh-hub
@@ -50,24 +28,17 @@ spec:
         - name: MQTT_PASSWORD
           value: ""
         - name: POSTGRES_HOST
-          value: "ioh-db"
-        - name: POSTGRES_USER
           value: "postgres"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: username
         - name: POSTGRES_PASSWORD
-          value: "TODO"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ioh-db
-  labels:
-    app: ioh-db
-spec:
-  selector:
-    app: ioh-db
-  ports:
-    - port: 5432
-      targetPort: 5432
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
 ---
 apiVersion: v1
 kind: Service
