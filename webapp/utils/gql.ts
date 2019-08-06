@@ -1,4 +1,10 @@
-export const QUERIES = {
+import { QueryType } from "./types";
+
+export const QUERIES: {
+  getClients: QueryType;
+  getConfig: QueryType;
+  setConfig: QueryType;
+} = {
   getClients: {
     operationName: "GetConfig",
     query: `

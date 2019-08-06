@@ -1,8 +1,17 @@
 import { useState } from "react";
+import { ClientType, ConfigType } from "utils/types";
 import { Component } from "react";
 import { setConfig as postConfig } from "utils/req";
 
-const Input = ({ title, value, onChange }) => (
+const Input = ({
+  title,
+  value,
+  onChange
+}: {
+  title: string;
+  value: string | number;
+  onChange: (string) => void;
+}) => (
   <div>
     <div>{title}:</div>
     <input
@@ -12,7 +21,7 @@ const Input = ({ title, value, onChange }) => (
   </div>
 );
 
-const Status = ({ active }) => (
+const Status = ({ active }: { active: boolean }) => (
   <div>
     <div
       style={{
@@ -27,9 +36,17 @@ const Status = ({ active }) => (
   </div>
 );
 
-const PlantConfigForm = ({ client, onPost }) => {
+const PlantConfigForm = ({
+  client,
+  onPost
+}: {
+  client: ClientType;
+  onPost: (id: string, config: ConfigType) => void;
+}) => {
   const { id, active, config: currentConfig } = client;
-  const [config, setConfig] = useState(currentConfig || {});
+  const [config, setConfig] = useState(
+    currentConfig || { plant: undefined, water: undefined }
+  );
   return (
     <div>
       <div>Id: {id}</div>

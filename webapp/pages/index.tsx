@@ -1,10 +1,19 @@
 import { useState } from "react";
 import Container from "components/container";
 import { getClients } from "utils/req";
+import { ClientType, ConfigType } from "utils/types";
 import Link from "next/link";
 import PlantConfigForm from "components/plantConfigForm";
 
-const ClientList = ({ clients, title, onPost }) => (
+const ClientList = ({
+  clients,
+  title,
+  onPost
+}: {
+  clients: ClientType[];
+  title: string;
+  onPost: (id: string, config: ConfigType) => void;
+}) => (
   <div>
     <h2>{title}</h2>
     {clients.map(client => (
@@ -13,7 +22,7 @@ const ClientList = ({ clients, title, onPost }) => (
   </div>
 );
 
-const Index = ({ clients: currentClients }) => {
+const Index = ({ clients: currentClients }: { clients: ClientType[] }) => {
   const [clients, setClients] = useState(currentClients);
   const configured = clients.filter(c => !!c.config);
   const unconfigured = clients.filter(c => !c.config);
@@ -28,17 +37,11 @@ const Index = ({ clients: currentClients }) => {
         <ClientList
           title="Unconfigured"
           clients={unconfigured}
-          setClients={setClients}
           onPost={onPost}
         />
       )}
       {configured.length > 0 && (
-        <ClientList
-          title="Configured"
-          clients={configured}
-          setClients={setClients}
-          onPost={onPost}
-        />
+        <ClientList title="Configured" clients={configured} onPost={onPost} />
       )}
     </Container>
   );
