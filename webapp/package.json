@@ -8,18 +8,21 @@
     "deploy:production": "now --target production"
   },
   "dependencies": {
+    "@now/node": "^0.12.4",
+    "@types/next": "^8.0.6",
+    "@types/node": "^12.7.1",
+    "@types/react": "^16.8.25",
+    "@types/react-dom": "^16.8.5",
+    "@zeit/next-typescript": "^1.1.1",
     "isomorphic-unfetch": "^3.0.0",
     "jwt-decode": "^2.2.0",
     "next": "^9.0.0",
-    "now": "^15.8.7",
     "react": "^16.5.1",
-    "react-dom": "^16.5.1"
+    "react-dom": "^16.5.1",
+    "typescript": "^3.5.3"
   },
   "devDependencies": {
-    "@types/node": "^12.6.9",
-    "@types/react": "^16.8.24",
-    "@types/react-dom": "^16.8.5",
-    "prettier": "^1.18.2",
-    "typescript": "^3.5.3"
+    "now": "^16.1.1",
+    "prettier": "^1.18.2"
   }
 }

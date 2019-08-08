@@ -59,10 +59,12 @@ metadata:
   name: ioh-hub-api
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
   - match: Host(`ioh-api.jbakken.com`)
     kind: Rule
     services:
     - name: ioh-hub
       port: 5151
+  tls:
+    certResolver: default
