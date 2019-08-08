@@ -32,3 +32,8 @@ export type SetConfigType = {
     setConfig: ConfigType;
   };
 };
+
+export type UserType = {
+  name: string;
+  email: string;
+};

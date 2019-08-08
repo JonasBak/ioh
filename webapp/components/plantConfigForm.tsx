@@ -1,6 +1,6 @@
+import { useAuth } from "utils/auth";
 import { useState } from "react";
 import { ClientType, ConfigType } from "utils/types";
-import { Component } from "react";
 import { setConfig as postConfig } from "utils/req";
 
 const Input = ({
@@ -43,6 +43,7 @@ const PlantConfigForm = ({
   client: ClientType;
   onPost: (id: string, config: ConfigType) => void;
 }) => {
+  const { accessToken } = useAuth();
   const { id, active, config: currentConfig } = client;
   const [config, setConfig] = useState(
     currentConfig || { plant: undefined, water: undefined }
@@ -73,7 +74,12 @@ const PlantConfigForm = ({
       />
       <button
         onClick={async () => {
-          const result = await postConfig(id, config.plant, config.water);
+          const result = await postConfig(
+            accessToken,
+            id,
+            config.plant,
+            config.water
+          );
           onPost(id, result.data.setConfig);
         }}
       >
