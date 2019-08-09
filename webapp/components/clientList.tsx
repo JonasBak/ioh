@@ -1,4 +1,4 @@
-import { useAuth } from "utils/auth";
+import { useAuth, AuthError } from "utils/auth";
 import { useState, useEffect } from "react";
 import { getClients } from "utils/req";
 import { ClientType, ConfigType } from "utils/types";
@@ -22,15 +22,24 @@ const List = ({
 );
 
 const ClientList = () => {
-  const { isAuthenticated, accessToken } = useAuth();
+  const { isAuthenticated, accessToken, authorizeUrl, logout } = useAuth();
   const [clients, setClients] = useState([]);
   const configured = clients.filter(c => !!c.config);
   const unconfigured = clients.filter(c => !c.config);
 
   useEffect(() => {
     const asyncWrapper = async () => {
-      const queryResult = await getClients(accessToken);
-      setClients(queryResult.data.clients);
+      try {
+        const queryResult = await getClients(accessToken);
+        setClients(queryResult.data.clients);
+      } catch (e) {
+        if (e instanceof AuthError) {
+          logout();
+          location.href = authorizeUrl;
+        } else {
+          console.error(e);
+        }
+      }
     };
     if (isAuthenticated) asyncWrapper();
   }, [isAuthenticated]);

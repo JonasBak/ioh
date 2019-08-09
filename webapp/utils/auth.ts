@@ -4,6 +4,8 @@ import { UserType } from "./types";
 
 const { domain, clientId, redirectURI, audience } = AUTH_CONFIG;
 
+export class AuthError extends Error {}
+
 export const authorizeUrl = `https://${domain}/authorize?
 response_type=id_token token&
 client_id=${clientId}&

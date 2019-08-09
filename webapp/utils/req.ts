@@ -1,4 +1,5 @@
 import { HUB_BASE_URL } from "utils/config";
+import { AuthError } from "utils/auth";
 import { QUERIES } from "utils/gql";
 import fetch from "isomorphic-unfetch";
 import { GetClientsType, GetConfigType, SetConfigType } from "utils/types";
@@ -17,6 +18,9 @@ const doQuery = async (accessToken, queryType, args = []) => {
         .reduce((obj, a) => ({ ...obj, ...a }), {})
     })
   });
+  if (req.status === 401) {
+    throw new AuthError("Not authorized");
+  }
   return await req.json();
 };
 

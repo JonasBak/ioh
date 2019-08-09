@@ -17,8 +17,6 @@ export const AuthWrapper = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated || !window) return;
 
-    if (loadLocalStorage(setAccessToken, setUser, setIsAuthenticated)) return;
-
     const encodedAccessToken = checkToken("access_token");
     const encodedIdToken = checkToken("id_token");
     if (encodedAccessToken && encodedIdToken) {
@@ -30,6 +28,8 @@ export const AuthWrapper = ({ children }) => {
 
       setLocalStorage(encodedAccessToken, user);
       window.history.pushState(null, "", "/");
+    } else {
+      loadLocalStorage(setAccessToken, setUser, setIsAuthenticated);
     }
   });
   const logout = () => {
