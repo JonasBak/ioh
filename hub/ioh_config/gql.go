@@ -11,6 +11,7 @@ const Schema string = `
                 }
                 type Query {
                         clients: [Client!]!
+                        client(clientId: ID!): Client
                         config(clientId: ID!): ClientConfig
                 }
                 type Client {
@@ -61,6 +62,10 @@ func NewResolver(config IOHConfig, onConfigChange func(string, ClientConfig)) Re
 
 func (r *Resolver) Clients() []Client {
 	return r.config.GetClients()
+}
+
+func (r *Resolver) Client(args struct{ ClientId graphql.ID }) *Client {
+	return r.config.GetClient(string(args.ClientId))
 }
 
 func (r *Resolver) Config(args struct{ ClientId graphql.ID }) *ClientConfig {

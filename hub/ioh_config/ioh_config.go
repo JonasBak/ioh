@@ -36,6 +36,11 @@ type IOHConfig struct {
 	db *sql.DB
 }
 
+func (conf IOHConfig) Connected() bool {
+	err := conf.db.Ping()
+	return err == nil
+}
+
 func (conf IOHConfig) GetClient(p string) *Client {
 	q := "SELECT id, active FROM clients WHERE id = $1"
 
@@ -47,6 +52,7 @@ func (conf IOHConfig) GetClient(p string) *Client {
 	} else if err != nil {
 		panic(err)
 	}
+	client.config_ptr = &conf
 	return &client
 }
 

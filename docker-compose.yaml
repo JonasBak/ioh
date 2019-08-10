@@ -22,9 +22,23 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=TODO
+      - DISABLE_AUTH=true
     depends_on:
       - db
       - mqtt_broker
+  tester:
+    build:
+      context: ./tester
+    environment:
+      - MQTT_BROKER=tcp://mqtt_broker:1883
+      - MQTT_USER=client
+      - MQTT_PASSWORD=TODO
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=TODO
+      - HUB_URL=http://hub:5151
+    depends_on:
+      - hub
   # webapp:
   #   build:
   #     context: ./webapp

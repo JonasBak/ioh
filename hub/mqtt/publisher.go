@@ -11,6 +11,10 @@ type Publisher struct {
 	c MQTT.Client
 }
 
+func (pub Publisher) Connected() bool {
+	return pub.c.IsConnected()
+}
+
 func GetPublisher() Publisher {
 	opts := MQTT.NewClientOptions().AddBroker(os.Getenv("MQTT_BROKER"))
 
