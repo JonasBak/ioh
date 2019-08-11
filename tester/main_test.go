@@ -107,15 +107,52 @@ func TestActiveAPI(t *testing.T) {
 
 	t.Log("Trying to deactivate")
 	client.Publish(statusTopic, 0, false, "OFF")
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	if fetchClient().Data.Client.Active {
 		t.Error("Client not deactivated")
 	}
 
 	t.Log("Trying to activate")
 	client.Publish(statusTopic, 0, false, "ON")
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	if !fetchClient().Data.Client.Active {
 		t.Error("Client not activated")
+	}
+}
+
+var configQuery = `{"query":"mutation {\n  setConfig(config: {clientId: \"tester\", plant: \"test\", water: 6}) {\n    water\n    plant\n  }\n}\n","variables":null}`
+
+func TestConfigAPI(t *testing.T) {
+	hubChannel := make(chan string, 10)
+	configChannel := make(chan string, 10)
+
+	t.Log("Connecting to broker")
+	client := getTestClient("config", hubChannel, configChannel)
+
+	t.Log("Making shure client exists")
+	client.Publish(discoverTopic, 0, false, "EMPTY")
+
+	t.Log("Posting config")
+	_, err := http.Post(fmt.Sprintf("%s/query", os.Getenv("HUB_URL")), "application/json", strings.NewReader(configQuery))
+	if err != nil {
+		panic(err)
+	}
+
+	t.Log("Checking mqtt")
+	select {
+	case res := <-configChannel:
+		t.Logf("Recieved: %s", res)
+		if res != "6" {
+			t.Error("Didn't recieve correct config")
+		}
+	case <-time.After(10 * time.Second):
+		t.Error("Timed out")
+	}
+
+	t.Log("Checking api")
+	config := fetchClient().Data.Client.Config
+
+	if config.Plant != "test" || config.Water != 6 {
+		t.Error("Config not updated correctly")
 	}
 }
